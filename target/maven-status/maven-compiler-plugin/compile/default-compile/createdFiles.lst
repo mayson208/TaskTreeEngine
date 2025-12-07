@@ -1,0 +1,10 @@
+com/tasktree/core/AnimationUtils.class
+com/tasktree/view/ConnectionPreviewCurve.class
+com/tasktree/model/TaskGraph.class
+com/tasktree/model/TaskNode.class
+com/tasktree/view/NodeView.class
+com/tasktree/view/CanvasView.class
+com/tasktree/app/Main.class
+com/tasktree/viewmodel/TaskTreeViewModel.class
+com/tasktree/view/EdgeView.class
+com/tasktree/core/ColorUtils.class
