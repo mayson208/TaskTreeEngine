@@ -1,6 +1,7 @@
 package com.tasktree.view;
 
 import com.tasktree.core.ColorUtils;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -10,12 +11,13 @@ public class NodeView extends StackPane {
 
     private Circle backgroundCircle;
     private Text label;
+    private TextField editor;
 
     private double mouseOffsetX;
     private double mouseOffsetY;
 
     private Runnable deleteHandler;
-    private Runnable createChildHandler;
+    private Runnable textCommitHandler;
 
     public NodeView(String text) {
         backgroundCircle = new Circle(40);
@@ -24,7 +26,12 @@ public class NodeView extends StackPane {
         label = new Text(text);
         label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
-        getChildren().addAll(backgroundCircle, label);
+        editor = new TextField(text);
+        editor.setVisible(false);
+        editor.setPrefWidth(80);
+        editor.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+
+        getChildren().addAll(backgroundCircle, label, editor);
         setPickOnBounds(false);
 
         setOnMousePressed(e -> {
@@ -39,18 +46,45 @@ public class NodeView extends StackPane {
             relocate(newX, newY);
             e.consume();
         });
+
+        setOnMouseClicked(e -> {
+            if (e.getClickCount() == 2) {
+                startEditing();
+                e.consume();
+            }
+        });
+
+        editor.setOnAction(e -> commitEditing());
+        editor.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) commitEditing();
+        });
     }
 
     public void setDeleteHandler(Runnable handler) {
         this.deleteHandler = handler;
     }
 
-    public void setCreateChildHandler(Runnable handler) {
-        this.createChildHandler = handler;
+    public void setTextCommitHandler(Runnable handler) {
+        this.textCommitHandler = handler;
     }
 
-    public void fireDelete() {
-        if (deleteHandler != null) deleteHandler.run();
+    private void startEditing() {
+        editor.setText(label.getText());
+        label.setVisible(false);
+        editor.setVisible(true);
+        editor.requestFocus();
+        editor.selectAll();
+    }
+
+    private void commitEditing() {
+        label.setText(editor.getText());
+        editor.setVisible(false);
+        label.setVisible(true);
+        if (textCommitHandler != null) textCommitHandler.run();
+    }
+
+    public String getText() {
+        return label.getText();
     }
 
     public void setPosition(double x, double y) {

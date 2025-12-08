@@ -95,6 +95,10 @@ public class CanvasView extends Pane {
         ui.setPosition(modelX, modelY);
 
         ui.setDeleteHandler(() -> deleteNode(ui));
+        ui.setTextCommitHandler(() -> {
+            TaskNode n = nodeMap.get(ui);
+            n.setLabel(ui.getText());
+        });
 
         nodes.add(ui);
         nodeMap.put(ui, data);
@@ -111,10 +115,9 @@ public class CanvasView extends Pane {
 
         List<EdgeView> toRemove = new ArrayList<>();
         for (EdgeView e : edges) {
-            if (e.getStartX() == ui.getLayoutX() || e.getEndX() == ui.getLayoutX()) {
-                toRemove.add(e);
-            }
+            toRemove.add(e);
         }
+
         edges.removeAll(toRemove);
         getChildren().removeAll(toRemove);
 
