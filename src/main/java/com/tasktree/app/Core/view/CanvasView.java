@@ -95,6 +95,7 @@ public class CanvasView extends Pane {
         ui.setPosition(modelX, modelY);
 
         ui.setDeleteHandler(() -> deleteNode(ui));
+        ui.setCreateChildHandler(() -> createChild(ui));
         ui.setTextCommitHandler(() -> {
             TaskNode n = nodeMap.get(ui);
             n.setLabel(ui.getText());
@@ -105,6 +106,22 @@ public class CanvasView extends Pane {
 
         getChildren().add(ui);
         return ui;
+    }
+
+    private void createChild(NodeView parent) {
+        TaskNode parentData = nodeMap.get(parent);
+
+        double x = parent.getLayoutX() + 140;
+        double y = parent.getLayoutY();
+
+        NodeView child = createNode(x, y);
+        TaskNode childData = nodeMap.get(child);
+
+        viewModel.connect(parentData, childData);
+        connectNodes(parent, child);
+
+        AnimationUtils.popIn(child);
+        selectNode(child);
     }
 
     private void deleteNode(NodeView ui) {
