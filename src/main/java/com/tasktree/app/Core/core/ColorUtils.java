@@ -4,22 +4,23 @@ import javafx.scene.paint.Color;
 
 public class ColorUtils {
 
-    private static final Color[] PASTEL_COLORS = {
-            Color.web("#A3D8F4"),
-            Color.web("#F7B2BD"),
-            Color.web("#C5E1A5"),
-            Color.web("#FFD59E"),
-            Color.web("#D7B4F3"),
-            Color.web("#FFB5E8"),
-            Color.web("#BFF0D4"),
-            Color.web("#FAE3B4")
-    };
-
-    private static int index = 0;
+    private static double hue = 0;
 
     public static Color nextPastelColor() {
-        Color c = PASTEL_COLORS[index];
-        index = (index + 1) % PASTEL_COLORS.length;
-        return c;
+        hue += 47;
+        hue %= 360;
+        return Color.hsb(hue, 0.45, 0.95);
+    }
+
+    public static Color shift(Color c, double amount) {
+        double h = (c.getHue() + amount) % 360;
+        return Color.hsb(h, c.getSaturation(), c.getBrightness());
+    }
+
+    public static Color readableTextColor(Color background) {
+        double luminance = (0.299 * background.getRed() +
+                            0.587 * background.getGreen() +
+                            0.114 * background.getBlue());
+        return luminance > 0.5 ? Color.BLACK : Color.WHITE;
     }
 }
