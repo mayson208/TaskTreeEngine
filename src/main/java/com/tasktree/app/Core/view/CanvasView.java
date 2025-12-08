@@ -1,6 +1,5 @@
 package com.tasktree.view;
 
-import com.tasktree.view.ConnectionPreviewCurve;
 import com.tasktree.core.AnimationUtils;
 import com.tasktree.viewmodel.TaskTreeViewModel;
 import com.tasktree.model.TaskNode;
@@ -45,6 +44,20 @@ public class CanvasView extends Pane {
         setOnMousePressed(this::handlePress);
         setOnMouseDragged(this::handleDrag);
         setOnScroll(this::handleScroll);
+
+        setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case DELETE:
+                case BACK_SPACE:
+                    if (selectedNode != null) {
+                        deleteNode(selectedNode);
+                        selectedNode = null;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     private void handleCanvasClick(MouseEvent e) {
@@ -81,27 +94,13 @@ public class CanvasView extends Pane {
         NodeView ui = new NodeView("Task");
         ui.setPosition(modelX, modelY);
 
-        ui.setOnDelete(n -> deleteNode(n));
-        ui.setOnCreateChild(n -> createChild(n));
+        ui.setDeleteHandler(() -> deleteNode(ui));
 
         nodes.add(ui);
         nodeMap.put(ui, data);
 
         getChildren().add(ui);
         return ui;
-    }
-
-    private void createChild(NodeView parent) {
-        TaskNode parentData = nodeMap.get(parent);
-
-        NodeView child = createNode(parent.getLayoutX() + 140, parent.getLayoutY());
-        TaskNode childData = nodeMap.get(child);
-
-        viewModel.connect(parentData, childData);
-        connectNodes(parent, child);
-
-        AnimationUtils.popIn(child);
-        selectNode(child);
     }
 
     private void deleteNode(NodeView ui) {
