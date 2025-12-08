@@ -7,6 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 public class NodeView extends StackPane {
@@ -14,6 +15,10 @@ public class NodeView extends StackPane {
     private Circle backgroundCircle;
     private Text label;
     private TextField editor;
+
+    private Circle resizeHandle;
+    private double resizeStartX;
+    private double resizeStartRadius;
 
     private double mouseOffsetX;
     private double mouseOffsetY;
@@ -34,20 +39,46 @@ public class NodeView extends StackPane {
         editor.setPrefWidth(80);
         editor.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
-        getChildren().addAll(backgroundCircle, label, editor);
+        resizeHandle = new Circle(7, Color.WHITE);
+        resizeHandle.setStroke(Color.BLACK);
+        resizeHandle.setStrokeWidth(1.2);
+
+        getChildren().addAll(backgroundCircle, label, editor, resizeHandle);
         setPickOnBounds(false);
+
+        resizeHandle.setTranslateX(backgroundCircle.getRadius() - 5);
+        resizeHandle.setTranslateY(backgroundCircle.getRadius() - 5);
 
         setOnMousePressed(e -> {
             mouseOffsetX = e.getSceneX() - getLayoutX();
             mouseOffsetY = e.getSceneY() - getLayoutY();
-            if (e.isSecondaryButtonDown()) showContextMenu(e.getScreenX(), e.getScreenY());
             e.consume();
         });
 
         setOnMouseDragged(e -> {
-            double newX = e.getSceneX() - mouseOffsetX;
-            double newY = e.getSceneY() - mouseOffsetY;
-            relocate(newX, newY);
+            if (!resizeHandle.isPressed()) {
+                double newX = e.getSceneX() - mouseOffsetX;
+                double newY = e.getSceneY() - mouseOffsetY;
+                relocate(newX, newY);
+            }
+            e.consume();
+        });
+
+        resizeHandle.setOnMousePressed(e -> {
+            resizeStartX = e.getSceneX();
+            resizeStartRadius = backgroundCircle.getRadius();
+            e.consume();
+        });
+
+        resizeHandle.setOnMouseDragged(e -> {
+            double delta = e.getSceneX() - resizeStartX;
+            double newRadius = Math.max(30, resizeStartRadius + delta);
+
+            backgroundCircle.setRadius(newRadius);
+
+            resizeHandle.setTranslateX(newRadius - 5);
+            resizeHandle.setTranslateY(newRadius - 5);
+
             e.consume();
         });
 
@@ -58,9 +89,15 @@ public class NodeView extends StackPane {
             }
         });
 
+        resizeHandle.setOnMouseClicked(e -> e.consume());
+
         editor.setOnAction(e -> commitEditing());
-        editor.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) commitEditing();
+        editor.focusedProperty().addListener((obs, o, n) -> {
+            if (!n) commitEditing();
+        });
+
+        setOnMousePressed(e -> {
+            if (e.isSecondaryButtonDown()) showContextMenu(e.getScreenX(), e.getScreenY());
         });
     }
 
@@ -94,7 +131,6 @@ public class NodeView extends StackPane {
         recolor.setOnAction(e -> backgroundCircle.setFill(ColorUtils.nextPastelColor()));
 
         menu.getItems().addAll(rename, addChild, recolor, delete);
-
         menu.show(this, x, y);
     }
 
@@ -121,9 +157,13 @@ public class NodeView extends StackPane {
         return label.getText();
     }
 
+    public double getRadius() {
+        return backgroundCircle.getRadius();
+    }
+
     public void setPosition(double x, double y) {
-        setLayoutX(x - 40);
-        setLayoutY(y - 40);
+        setLayoutX(x - backgroundCircle.getRadius());
+        setLayoutY(y - backgroundCircle.getRadius());
     }
 
     public void setSelected(boolean selected) {

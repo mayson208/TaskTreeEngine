@@ -54,8 +54,6 @@ public class CanvasView extends Pane {
                         selectedNode = null;
                     }
                     break;
-                default:
-                    break;
             }
         });
     }
@@ -163,8 +161,8 @@ public class CanvasView extends Pane {
     private void handleMouseMove(MouseEvent e) {
         if (previewCurve == null || connectionStartNode == null) return;
 
-        double startX = connectionStartNode.getLayoutX() + connectionStartNode.getWidth() / 2;
-        double startY = connectionStartNode.getLayoutY() + connectionStartNode.getHeight() / 2;
+        double startX = connectionStartNode.getLayoutX() + connectionStartNode.getRadius();
+        double startY = connectionStartNode.getLayoutY() + connectionStartNode.getRadius();
 
         double endX = (e.getX() - translate.getX()) / scale.getX();
         double endY = (e.getY() - translate.getY()) / scale.getY();
