@@ -1,48 +1,47 @@
 package com.tasktree.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class TaskNode {
 
     private String id;
-    private String label;
+    private String title;
+
     private double x;
     private double y;
 
-    private List<TaskNode> children = new ArrayList<>();
-
-    public TaskNode(String label) {
+    public TaskNode(String title, double x, double y) {
         this.id = UUID.randomUUID().toString();
-        this.label = label;
+        this.title = title;
+        this.x = x;
+        this.y = y;
     }
 
     public String getId() {
         return id;
     }
 
-    public String getLabel() {
-        return label;
+    public String getTitle() {
+        return title;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public void addChild(TaskNode child) {
-        children.add(child);
+    public double getX() {
+        return x;
     }
 
-    public List<TaskNode> getChildren() {
-        return children;
-    }
-
-    public void setPosition(double x, double y) {
+    public void setX(double x) {
         this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
         this.y = y;
     }
-
-    public double getX() { return x; }
-    public double getY() { return y; }
 }
