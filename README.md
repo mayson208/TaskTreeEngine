@@ -137,7 +137,6 @@ Save/load project state
 - **Mason** — Lead Developer  
 - **Nat** — Co-Developer (GitHub link coming soon)
 
-
 📝 Notes
 
 This project is still early-stage, but the foundation is intentionally strong so it can grow into a full creative productivity tool.
